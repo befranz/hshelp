@@ -41,5 +41,6 @@ If you don't use any firewall consider running one like ```ufw``` and set the sp
 ### Service and Usage
 Some useful commands - hsd status: ```systemctl status hsd``` - hsd restart: ```sudo systemctl restart hsd```
 
-hsd node is accessable via ```hsd-cli```, ```hsw-cli``` and API, full documentation here: https://hsd-dev.org/api-docs/
+hsd node is accessable via ```hsd-cli```, ```hsw-cli``` and API.
+Full documentation: https://hsd-dev.org/api-docs/ 
 
