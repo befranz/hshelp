@@ -32,7 +32,7 @@ hshelp/install-all-hsd
 ![2BDA7A6E-53AD-4F8A-B9F0-2E2E1A8C9AC9_4_5005_c](https://user-images.githubusercontent.com/46194732/153889206-d0c6f38f-9829-4d83-a462-052e02cdd40a.jpeg)
 
 
-During this first chain sync hsd is still running as a non listening node. After you restart hsd or reboot - which also makes sense since most probably some installed components might require a reboot anyway - the node allows 500 inbound connections. Those could be other full nodes but also SPV nodes like hnsd or Fingertip. Running listening public full nodes are essential for Handshake, you do great support by running one!
+During this first chain sync hsd is still running as a non listening node. After you restart hsd or reboot - which also makes sense since most probably some installed components might require a reboot anyway - the node allows 500 inbound connections. Those could be other full nodes but also SPV nodes like [hnsd](https://github.com/handshake-org/hnsd) or [Fingertip](https://github.com/imperviousinc/fingertip). Running listening public full nodes are essential for Handshake, you do great support by running one!
 
 ### Further Settings
 The node listens to port ```12038``` and ```44806```. Make sure you allowed those ports on incoming traffic.
