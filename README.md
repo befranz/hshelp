@@ -35,7 +35,7 @@ chmod +x install-all-hsd
 During this first chain sync hsd is still running as a non listening node. After you restart hsd or reboot - which also makes sense since most probably some installed components might require a reboot anyway - the node allows 500 inbound connections. Those could be other full nodes but also SPV nodes like hnsd or Fingertip. Running listening public full nodes are essential for Handshake, you do great support by running one!
 
 ### Further Settings
-The node listens on port ```12038``` and ```44806```. Make sure you allow those ports on incoming traffic.
+The node listens to port ```12038``` and ```44806```. Make sure you allowed those ports on incoming traffic.
 
 If you don't use any firewall consider running one like ```ufw``` and set the specific ports. (Don't forget to set your ssh port ;-)
 
