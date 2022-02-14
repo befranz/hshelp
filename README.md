@@ -6,7 +6,7 @@ This script installs a Handshake full node (https://github.com/handshake-org/hsd
 
 ### Prerequisites
 * Ubuntu (20.04 LTS preferred) or Debian
-* Static public IP address
+* Static public IP address (for listening full node)
 * 2GB RAM
 * Enough storage space, the current chain (Feb 2022) takes already about 15GB - check via ```df -h```
 
