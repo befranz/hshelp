@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+
+# install-all-hsd v.1.1.0
+# Installs handshake hsd (https://github.com/handshake-org/hsd)
+# on Ubuntu (20.04 LTS preferred) or Debian
+
+# Make sure you have at least 25GB storage free on your system!
+
+LISTEN="true"
+MAXINBOUND=500
+
+####
+if [ ! -f "/etc/debian_version" ]; then
+  echo "Install script only for Ubuntu/Debian!"
+  exit 1
+fi
+
+B="\e[1m"
+G="\e[32m"
+R="\e[31m"
+E="\e[0m"
+NL='
+'
+
+function check_hsd {
+	if pgrep -x "hsd-worker" >/dev/null 2>&1; then
+		HSDVERSION="$(hsd-cli info|jq -r .version)"
+		HSDRUNNING="true"
+	else
+		HSDRUNNING="false"
+	fi
+}
+
+function initialsetup {
+  sudo timedatectl set-timezone UTC
+
+  sudo apt update
+  sudo apt upgrade -y
+
+  sudo apt -y install git nodejs npm build-essential curl jq libunbound-dev
+
+  sudo npm install -g n
+  sudo n lts
+  sudo npm install -g node-gyp
+
+  NODE="$(which node)"
+  if [ ! "$NODE" ]; then
+    echo -e "${R}Node not (properly) installed!${E}"
+    exit 1
+  fi
+}
+
+function install_hsd {
+  cd ${HOME}
+
+  git clone https://github.com/handshake-org/hsd
+
+  cd hsd
+  npm install --production
+  sudo npm install -g hs-client
+}
+
+function service_hsd {
+  HSDSVCFILE="/lib/systemd/system/hsd.service"
+
+  HSDSVCTXT=$(echo -e "[Unit]
+Description=hsd
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+Environment=HSD_PREFIX=${HOME}/.hsd
+ExecStart=${NODE} ${HOME}/hsd/bin/hsd
+
+[Install]
+WantedBy=multi-user.target
+")
+
+  echo "$HSDSVCTXT" | sudo tee $HSDSVCFILE > /dev/null
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable hsd.service
+}
+
+function config_hsd {
+  MYIP=$(dig @resolver4.opendns.com myip.opendns.com +short)
+
+  HSDCFGFILE="${HOME}/.hsd/hsd.conf"
+
+  HSDCFGTXT=$(echo -e "log-level: info
+no-wallet: true
+rs-host: 0.0.0.0
+rs-port: 5350
+listen: $1
+bip37: true
+public-host: $MYIP
+max-inbound: $MAXINBOUND
+")
+
+  mkdir -p ${HOME}/.hsd
+  echo "$HSDCFGTXT" >$HSDCFGFILE
+}
+
+function start_hsd {
+  sudo systemctl start hsd
+  sleep 5s
+  if [ "$(systemctl is-active hsd)" = "active" ]; then
+    HSDVERSION="$(hsd-cli info|jq -r .version)"
+    echo -e "${NL}${G}###${E}"
+    echo -e "${NL}${G}hsd $HSDVERSION successfully started as service!${E}"
+  else
+    echo -e "${NL}${R}hsd service not started!${E}"
+    exit 1
+  fi
+}
+
+function show_config {
+  echo -e "
+${B}Current hsd config file${E} ($HSDCFGFILE):
+
+###
+$(cat $HSDCFGFILE)
+###
+
+Syncing the chain may take few hours (depending on hardware/env.)
+
+Currently hsd is set as non-listening node.
+
+Some Commands:
+hsd service status:   ${B}systemctl status hsd${E}
+hsd service restart:  ${B}sudo systemctl restart hsd${E}
+"
+
+if [ "$LISTEN" = "true" ]; then
+  echo -e "${G}After the chain is 100% synced${E} please ${G}restart hsd${E} or even reboot
+your system to change hsd to a listening public full node with $MAXINBOUND
+allowed inbound connections. This is great support for Handshake!"
+fi
+}
+
+function show_block {
+  echo -e "${NL}hsd is running as a service, you can stop this script at any time (Ctrl-C)${NL}"
+  while true; do
+    HSDINFO="$(hsd-cli info)"
+    BLOCK="$(echo "$HSDINFO"|jq .chain.height)"
+    PROGESS="$(echo "$HSDINFO"|jq .chain.progress)"
+    PROGRESS=$(awk "BEGIN {printf \"%.1f\n\", ${PROGESS}*100}")
+    echo -n -e "\r${G}hsd $HSDVERSION is syncing${E} - current block height: ${G}$BLOCK (${PROGRESS%\.*}%)${E}"
+    for i in {1..10}; do
+      sleep 1s
+      printf '.'
+    done
+  done
+}
+
+# Main
+
+check_hsd
+if [ "$HSDRUNNING" = "false" ]; then
+	initialsetup
+	install_hsd
+	service_hsd
+	config_hsd false
+	start_hsd
+	show_config
+	config_hsd $LISTEN
+fi
+show_block
+
+exit
