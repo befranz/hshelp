@@ -21,6 +21,7 @@ su - <Username>
 On a new deployed system this installation takes about 3 minutes before hsd full node is started as service. 
 Duration of a full chain sync depends on your system, most important is fast storage. On performant entry level VPS it takes few hours.
 ```
+sudo apt update
 sudo apt install git
 cd ~
 git clone https://github.com/befranz/hshelp
