@@ -23,11 +23,9 @@ Duration of a full chain sync depends on your system, most important is fast sto
 ```
 sudo apt update
 sudo apt install git
-cd ~
+cd
 git clone https://github.com/befranz/hshelp
-cd hshelp
-chmod +x install-all-hsd
-./install-all-hsd
+hshelp/install-all-hsd
 ```
 
 ![2BDA7A6E-53AD-4F8A-B9F0-2E2E1A8C9AC9_4_5005_c](https://user-images.githubusercontent.com/46194732/153889206-d0c6f38f-9829-4d83-a462-052e02cdd40a.jpeg)
