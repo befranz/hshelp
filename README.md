@@ -1,2 +1,36 @@
-# hshelp
-Tools for Handshake (hsd install script and others)
+# hshelp - Tools for Handshake (hsd install script and others)
+
+## install-all-hsd
+
+This script installs a Handshake full node (https://github.com/handshake-org/hsd) and all dependencies.
+
+### Prerequisites
+* Ubuntu (20.04 LTS preferred) or Debian
+* 2GB RAM
+* Enough storage space, the current chain (Feb 2022) takes already about 15GB - check via ```df -h```
+
+If you install this on a new deployed system and currently work with user ```root``` consider using a different user with root privilegies. 
+
+```
+adduser <Username>
+usermod -aG sudo <Username>
+su - <Username>
+````
+### Installation
+On a new deployed system this installation takes about 3 minutes before hsd full node is started as service. 
+Duration of a full chain sync depends on your system, most important is fast storage. On performant entry level VPS it takes few hours.
+```
+sudo apt install git
+cd ~
+git clone https://github.com/befranz/hshelp
+cd hshelp
+chmod +x install-all-hsd
+./install-all-hsd
+```
+
+During this first chain sync hsd is still running as a non listening node. After you restart hsd or reboot - which also makes sense since most probably some installed components might require a reboot anyway - the node allows 500 inbound connections. Those could be other full nodes but also SPV nodes like hnsd or Fingertip. Running listening public full nodes are essential for Handshake, you do great support by running one!
+
+### Further Settings
+The node listens on port ```12038``` and ```44806```. Make sure you allow those ports on incoming traffic.
+
+If you don't use any firewall consider running one like ```ufw``` and set the specific ports. (Don't forget to set your ssh port ;-)
