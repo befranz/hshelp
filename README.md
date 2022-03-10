@@ -48,4 +48,4 @@ Full documentation: https://hsd-dev.org/api-docs/
 ### Generate Map with connected Nodes
 This command generates a link provided by ipinfo.io where all inbound connections of other nodes (Bob Desktop, Bob Extension, Fingertip, basically other full and spv nodes) are visible on a map:
 
-```hsd-cli rpc getpeerinfo | jq -r '.[]|select(.inbound=true)|.addr|sub(":.*$";"")' | curl -s -XPOST --data-binary @- "ipinfo.io/tools/map?cli=1"|jq -r .reportUrl```
+```hsd-cli rpc getpeerinfo | jq -r '.[]|select(.inbound==true)|.addr|sub(":.*$";"")' | curl -s -XPOST --data-binary @- "ipinfo.io/tools/map?cli=1"|jq -r .reportUrl```
