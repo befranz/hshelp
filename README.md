@@ -46,6 +46,6 @@ hsd node is accessable via ```hsd-cli```, ```hsw-cli``` and API.
 Full documentation: https://hsd-dev.org/api-docs/ 
 
 ### Generate Map and detailed Node Report
-This command generates a link to a report provided by ipinfo.io of all inbound connections of other nodes (Bob Desktop, Bob Extension, Fingertip, basically other full and spv nodes).
+This command generates a link to a report provided by ipinfo.io of all inbound connections of other nodes (Bob Wallet Desktop, Fingertip, basically other full and spv nodes).
 
 ```hsd-cli rpc getpeerinfo | jq -r '.[]|select(.inbound==true)|.addr|sub(":.*$";"")' | curl -s -XPOST --data-binary @- "ipinfo.io/tools/summarize-ips?cli=1"|jq -r .reportUrl```
