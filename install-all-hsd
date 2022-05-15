@@ -73,7 +73,7 @@ Restart=always
 RestartSec=1
 User=root
 Environment=HSD_PREFIX=${HOME}/.hsd
-ExecStart=${NODE} ${HOME}/hsd/bin/hsd
+ExecStart=${NODE} ${HOME}/hsd/bin/hsd --no-wallet
 
 [Install]
 WantedBy=multi-user.target
@@ -91,9 +91,6 @@ function config_hsd {
   HSDCFGFILE="${HOME}/.hsd/hsd.conf"
 
   HSDCFGTXT=$(echo -e "log-level: info
-no-wallet: true
-rs-host: 0.0.0.0
-rs-port: 5350
 listen: $1
 bip37: true
 public-host: $MYIP
