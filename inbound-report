@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# inbound-report v.1.0.0
+# Creates Report of hsd inbound connections and starts http redirect
+# In case you run a firewall - which you should really do:
+# Make sure to allow PORT (like 'ufw allow <PORT>')
+
+PORT=50505
+
+if [ -z "$(which socat)" ]; then
+  echo "socat is necessary and will be installed..."
+  echo
+  sudo apt update
+  sudo apt install -y socat
+  echo
+fi
+
+if [ -n "$CRONCMD" ] ; then
+  sleep $(($RANDOM % 30 + 1))s
+fi
+
+LINK=$(/usr/local/bin/hsd-cli rpc getpeerinfo|jq -r '.[]|select(.inbound==true)|.addr|sub(":.*$";"")'|curl -s -XPOST --data-binary @- "ipinfo.io/tools/summarize-ips?cli=1"|jq -r .reportUrl)
+
+MYIP=$(dig @resolver4.opendns.com myip.opendns.com +short)
+
+echo "http://${MYIP}:${PORT} -> $LINK"
+
+pkill -9 -f "TCP-LISTEN:${PORT},"
+socat -v -d TCP-LISTEN:${PORT},bind=${MYIP},crlf,reuseaddr,fork 'SYSTEM:echo "HTTP/1.1 302 Found";echo "Content-Length: 0";echo "Location: '${LINK}'";echo;echo' >/dev/null 2>&1 &
