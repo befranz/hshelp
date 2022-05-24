@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-# install-all-hsd v.1.1.0
+# install-all-hsd v.1.2.0
 # Installs handshake hsd (https://github.com/handshake-org/hsd)
 # on Ubuntu (20.04 LTS preferred) or Debian
 
-# Make sure you have at least 25GB storage free on your system!
+# Make sure you have at least 35GB storage free on your system!
 
+HSDDATA="$HOME/.hsd"
 LISTEN="true"
 MAXINBOUND=500
 
@@ -21,6 +22,19 @@ R="\e[31m"
 E="\e[0m"
 NL='
 '
+if [ -n "$1" ]; then
+	if [ -d "$HSDDATA" ]; then
+		echo "Data path $1 can't be set! Remove $HSDDATA first."
+		exit 1
+	else
+		if mkdir -p ${1}; then
+			HSDDATA="$1"
+		else
+			echo "Data path $1 can't be set!"
+			exit 1
+		fi
+	fi
+fi
 
 function check_hsd {
 	if pgrep -x "hsd-worker" >/dev/null 2>&1; then
@@ -72,7 +86,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=root
-Environment=HSD_PREFIX=${HOME}/.hsd
+Environment=HSD_PREFIX=$HSDDATA
 ExecStart=${NODE} ${HOME}/hsd/bin/hsd --no-wallet
 
 [Install]
@@ -88,7 +102,7 @@ WantedBy=multi-user.target
 function config_hsd {
   MYIP=$(dig @resolver4.opendns.com myip.opendns.com +short)
 
-  HSDCFGFILE="${HOME}/.hsd/hsd.conf"
+  HSDCFGFILE="${HSDDATA}/hsd.conf"
 
   HSDCFGTXT=$(echo -e "log-level: info
 listen: $1
@@ -97,7 +111,7 @@ public-host: $MYIP
 max-inbound: $MAXINBOUND
 ")
 
-  mkdir -p ${HOME}/.hsd
+  mkdir -p $HSDDATA
   echo "$HSDCFGTXT" >$HSDCFGFILE
 }
 

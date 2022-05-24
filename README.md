@@ -10,7 +10,7 @@ This script installs a Handshake full node (https://github.com/handshake-org/hsd
 * 2GB RAM
 * Enough storage space, the current chain (Feb 2022) takes already about 15GB - check via ```df -h```
 
-If you install this on a new deployed system and currently work with user ```root``` consider using a different user with root privilegies. 
+If you install this on a new deployed system and currently work with user ```root``` consider using a different user with root privilegies.
 
 ```
 adduser <Username>
@@ -19,7 +19,7 @@ su - <Username>
 ````
 
 ### Installation
-On a new deployed system this installation takes about 3 minutes before hsd full node is started as service. 
+On a new deployed system this installation takes about 3 minutes before hsd full node is started as service.
 Duration of a full chain sync depends on your system, most important is fast storage. On performant entry level VPS it takes few hours.
 ```
 sudo apt update
@@ -28,6 +28,8 @@ cd
 git clone https://github.com/befranz/hshelp
 hshelp/install-all-hsd
 ```
+
+Per default all blockchain data, config and log files are under ```${HOME}/.hsd```. You can set an alternative path by adding it as parameter like ```hshelp/install-all-hsd /some/where/else```.
 
 ![2BDA7A6E-53AD-4F8A-B9F0-2E2E1A8C9AC9_4_5005_c](https://user-images.githubusercontent.com/46194732/153889206-d0c6f38f-9829-4d83-a462-052e02cdd40a.jpeg)
 
@@ -43,7 +45,7 @@ If you don't use any firewall consider running one like ```ufw``` and set the sp
 Some useful commands - hsd status: ```systemctl status hsd``` - hsd restart: ```sudo systemctl restart hsd```
 
 hsd node is accessable via ```hsd-cli```, ```hsw-cli``` and API.
-Full documentation: https://hsd-dev.org/api-docs/ 
+Full documentation: https://hsd-dev.org/api-docs/
 
 ### Generate Map and detailed Node Report
 This command generates a link to a report provided by ipinfo.io of all inbound connections of other nodes (Bob Wallet Desktop, Fingertip, basically other full and spv nodes).
