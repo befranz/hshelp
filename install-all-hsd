@@ -23,26 +23,26 @@ E="\e[0m"
 NL='
 '
 if [ -n "$1" ]; then
-	if [ -d "$HSDDATA" ]; then
-		echo "Data path $1 can't be set! Remove $HSDDATA first."
-		exit 1
-	else
-		if mkdir -p ${1}; then
-			HSDDATA="$1"
-		else
-			echo "Data path $1 can't be set!"
-			exit 1
-		fi
-	fi
+  if [ -d "$HSDDATA" ]; then
+    echo "Data path $1 can't be set! Remove $HSDDATA first."
+    exit 1
+  else
+    if mkdir -p ${1}; then
+      HSDDATA="$1"
+    else
+      echo "Data path $1 can't be set!"
+      exit 1
+    fi
+  fi
 fi
 
 function check_hsd {
-	if pgrep -x "hsd-worker" >/dev/null 2>&1; then
-		HSDVERSION="$(hsd-cli info|jq -r .version)"
-		HSDRUNNING="true"
-	else
-		HSDRUNNING="false"
-	fi
+  if pgrep -x "hsd-worker" >/dev/null 2>&1; then
+    HSDVERSION="$(hsd-cli info|jq -r .version)"
+    HSDRUNNING="true"
+  else
+    HSDRUNNING="false"
+  fi
 }
 
 function initialsetup {
@@ -171,13 +171,13 @@ function show_block {
 
 check_hsd
 if [ "$HSDRUNNING" = "false" ]; then
-	initialsetup
-	install_hsd
-	service_hsd
-	config_hsd false
-	start_hsd
-	show_config
-	config_hsd $LISTEN
+  initialsetup
+  install_hsd
+  service_hsd
+  config_hsd false
+  start_hsd
+  show_config
+  config_hsd $LISTEN
 fi
 show_block
 
