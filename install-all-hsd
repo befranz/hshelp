@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# install-all-hsd v.1.2.0
+# install-all-hsd v.1.2.1
 # Installs handshake hsd (https://github.com/handshake-org/hsd)
 # on Ubuntu (20.04 LTS preferred) or Debian
 
@@ -51,7 +51,7 @@ function initialsetup {
   sudo apt update
   sudo apt upgrade -y
 
-  sudo apt -y install git nodejs npm build-essential curl jq libunbound-dev
+  sudo apt -y install git nodejs npm build-essential curl jq libunbound-dev socat dnsutils
 
   sudo npm install -g n
   sudo n lts
