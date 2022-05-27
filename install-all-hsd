@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# install-all-hsd v.1.2.1
+# install-all-hsd v.1.3.0
 # Installs handshake hsd (https://github.com/handshake-org/hsd)
 # on Ubuntu (20.04 LTS preferred) or Debian
 
@@ -8,7 +8,7 @@
 
 HSDDATA="$HOME/.hsd"
 LISTEN="true"
-MAXINBOUND=500
+MAXINBOUND=800
 
 ####
 if [ ! -f "/etc/debian_version" ]; then
@@ -37,11 +37,15 @@ if [ -n "$1" ]; then
 fi
 
 function check_hsd {
-  if pgrep -x "hsd-worker" >/dev/null 2>&1; then
+  HSDRUNNING=$(pgrep -cx hsd)
+  if [ $HSDRUNNING -eq 1 ]; then
     HSDVERSION="$(hsd-cli info|jq -r .version)"
-    HSDRUNNING="true"
+    HSDUPDATE=1
   else
-    HSDRUNNING="false"
+    HSDUPDATE=0
+    if [ -d "${HOME}/hsd" ]; then
+      HSDUPDATE=1
+    fi
   fi
 }
 
@@ -51,7 +55,7 @@ function initialsetup {
   sudo apt update
   sudo apt upgrade -y
 
-  sudo apt -y install git nodejs npm build-essential curl jq libunbound-dev socat dnsutils
+  sudo apt -y install git nodejs npm build-essential curl jq libunbound-dev gpg socat dnsutils
 
   sudo npm install -g n
   sudo n lts
@@ -64,14 +68,45 @@ function initialsetup {
   fi
 }
 
+function installkeys {
+  # Install keys from devs (https://github.com/handshake-org/hsd/blob/master/SECURITY.md)
+  gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys "B4B1F62DBAC084E333F3A04A8962AB9DE6666BBD"
+  gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys "E61773CD6E01040E2F1BD78CE7E2984B6289C93A"
+  gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys "D2B2828BD29374D5E9BA3E52CCE677B05CC0FE23"
+}
+
+function verifykeys {
+  git verify-tag latest
+  RC=$?
+  if [ $RC -ne 0 ]; then
+    echo -e "${R}Installed code can't be verified!${E}"
+    echo "See https://github.com/handshake-org/hsd/blob/master/SECURITY.md"
+    exit 1
+  fi
+}
+
 function install_hsd {
   cd ${HOME}
 
-  git clone https://github.com/handshake-org/hsd
+  git clone --depth 1 --branch latest https://github.com/handshake-org/hsd.git
 
   cd hsd
+
+  verifykeys
+
   npm install --production
   sudo npm install -g hs-client
+}
+
+function update_hsd {
+  cd ${HOME}/hsd
+
+  git pull
+
+  verifykeys
+  echo
+  echo "If a new version is installed, activate it by restarting hsd:"
+  echo -e "${G}sudo systemctl restart hsd${E}"
 }
 
 function service_hsd {
@@ -170,15 +205,25 @@ function show_block {
 # Main
 
 check_hsd
-if [ "$HSDRUNNING" = "false" ]; then
+if [ $HSDUPDATE -eq 0 ]; then
   initialsetup
+  installkeys
   install_hsd
   service_hsd
   config_hsd false
   start_hsd
   show_config
   config_hsd $LISTEN
+  show_block
+else
+  update_hsd
+  if [ $HSDRUNNING -eq 1 ]; then
+    show_block
+  else
+    echo
+    echo "hsd is installed but not running."
+    echo -e "To start hsd: ${G}sudo systemctl start hsd${E}"
+  fi
 fi
-show_block
 
 exit
