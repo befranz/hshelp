@@ -47,6 +47,10 @@ Some useful commands - hsd status: ```systemctl status hsd``` - hsd restart: ```
 hsd node is accessable via ```hsd-cli```, ```hsw-cli``` and API.
 Full documentation: https://hsd-dev.org/api-docs/
 
+### hsd Update
+
+If you run the script while hsd is already installed it will try to update to the latest release.
+
 ### Generate Map and detailed Node Report
 This command generates a link to a report provided by ipinfo.io of all inbound connections of other nodes (Bob Wallet Desktop, Fingertip, basically other full and spv nodes).
 
