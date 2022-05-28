@@ -13,7 +13,7 @@ This script installs a Handshake full node (https://github.com/handshake-org/hsd
 If you install this on a new deployed system and currently work with user ```root``` consider using a different user with root privilegies.
 
 ```
-adduser <Username>
+adduser -m -d /home/<Username> <Username>
 usermod -aG sudo <Username>
 su - <Username>
 ````
@@ -46,6 +46,8 @@ Some useful commands - hsd status: ```systemctl status hsd``` - hsd restart: ```
 
 hsd node is accessable via ```hsd-cli```, ```hsw-cli``` and API.
 Full documentation: https://hsd-dev.org/api-docs/
+
+To check the current outbound and inbound connections call ```hsd-cli info|jq .pool```
 
 ### hsd Update
 
